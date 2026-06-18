@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bird Run: Sky Blue Overdrive</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      background: #02010a;
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      min-height: 100vh; user-select: none;
+      padding: 40px 20px; color: #fff;
+      overflow-y: auto; overflow-x: hidden;
+      position: relative;
+    }
+
+    /* ── RETRO ELECTRONIC BACKGROUND FX ── */
+    .space-warp-tunnel {
+      position: absolute; inset: 0;
+      background: 
+        radial-gradient(circle at 20% 30%, rgba(0, 229, 255, 0.25) 0%, transparent 60%),
+        radial-gradient(circle at 80% 70%, rgba(236, 72, 153, 0.2) 0%, transparent 60%),
+        radial-gradient(circle at 50% 50%, #020617 0%, #000 100%);
+      z-index: -3;
+    }
+
+    .bg-anomalies {
+      position: absolute; inset: -50%;
+      background-image: 
+        linear-gradient(rgba(0, 229, 255, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 229, 255, 0.1) 1px, transparent 1px);
+      background-size: 30px 30px;
+      z-index: -2;
+      transform: perspective(500px) rotateX(60deg) translateY(0);
+      animation: hyperStreamBackground 2.5s linear infinite;
+    }
+    @keyframes hyperStreamBackground {
+      0% { background-position: 0 0; }
+      100% { background-position: 0 120px; }
+    }
+
+    .ambient-glow-pod {
+      position: absolute; width: 700px; height: 700px; border-radius: 50%;
+      filter: blur(160px); opacity: 0.5; mix-blend-mode: screen; z-index: -1;
+      animation: enginePulse 3s infinite alternate ease-in-out;
+    }
+    .glow-left { left: -15%; top: 5%; background: radial-gradient(#00e5ff, transparent 70%); }
+    .glow-right { right: -15%; bottom: 5%; background: radial-gradient(#ec4899, transparent 70%); animation-delay: -1.5s; }
+    
+    @keyframes enginePulse {
+      0% { transform: scale(0.9) translate(0, 0); opacity: 0.4; }
+      100% { transform: scale(1.2) translate(30px, -20px); opacity: 0.7; }
+    }
+
+    .edge-lightning {
+      position: absolute; background: linear-gradient(to bottom, transparent, #ffdd57, #ec4899, #3b82f6, transparent);
+      opacity: 0.8; filter: drop-shadow(0 0 20px #00e5ff); z-index: -1;
+    }
+    .edge-left { left: 10px; top: 0; width: 4px; height: 100%; animation: dropLaser 1.8s infinite linear; }
+    .edge-right { right: 10px; top: 0; width: 4px; height: 100%; animation: dropLaser 1.8s infinite linear; animation-delay: 0.9s; }
+    @keyframes dropLaser { 0% { transform: translateY(-100%); } 100% { transform: translateY(100%); } }
+
+    /* ── HEADER ── */
+    .header-container { text-align: center; margin-bottom: 1rem; position: relative; }
+    h1 {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 3.5rem; letter-spacing: 0.2em; text-transform: uppercase; font-weight: 900;
+      background: linear-gradient(90deg, #00e5ff, #ec4899, #6366f1, #ffdd57, #00e5ff);
+      background-size: 300% auto;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      animation: neonShift 2.5s linear infinite;
+      filter: drop-shadow(0 0 20px rgba(0, 229, 255, 0.6));
+    }
+    @keyframes neonShift { to { background-position: 300% center; } }
+
+    .stage-container {
+      display: flex; align-items: center; justify-content: center;
+      gap: 40px; max-width: 1500px; width: 100%; position: relative; z-index: 2;
+    }
+    @media (max-width: 1250px) {
+      .stage-container { flex-direction: column; gap: 30px; }
+    }
+
+    /* ── INTERACTIVE MASCOTS ── */
+    .welcome-bird-wingman { display: flex; flex-direction: column; align-items: center; width: 180px; }
+    .talking-bird {
+      width: 110px; height: 110px; border-radius: 50%; position: relative;
+      box-shadow: 0 0 50px var(--glow), inset 0 -8px 16px rgba(0,0,0,0.6);
+      background: var(--main); animation: hyperThrusterFloat 1.2s infinite ease-in-out;
+      border: 4px solid #fff;
+    }
+    .mascot-left .talking-bird { --main: linear-gradient(135deg, #00838f, #00e5ff); --glow: #00e5ff; }
+    .mascot-right .talking-bird { --main: linear-gradient(135deg, #db2777, #f472b6); --glow: #ec4899; animation-delay: 0.6s; }
+
+    @keyframes hyperThrusterFloat {
+      0%, 100% { transform: translateY(0) scale(1) rotate(5deg); }
+      50% { transform: translateY(-25px) scale(1.06) rotate(-5deg); filter: brightness(1.25); }
+    }
+
+    .bird-eye { position: absolute; top: 26px; width: 26px; height: 32px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; animation: autoBlink 2.5s infinite ease-in-out; }
+    .bird-eye.left-eye { left: 28px; } .bird-eye.right-eye { left: 58px; }
+    @keyframes autoBlink { 0%, 45%, 55%, 100% { transform: scaleY(1); } 50% { transform: scaleY(0.05); } }
+    .bird-pupil { width: 14px; height: 16px; background: #000; border-radius: 50%; position: relative; animation: twitchyEyes 0.8s infinite alternate ease-in-out; }
+    @keyframes twitchyEyes { 0% { transform: translate(-2px, 1px); } 100% { transform: translate(3px, -2px); } }
+
+    .bird-beak-container { position: absolute; top: 54px; left: 42px; width: 28px; height: 28px; }
+    .beak-top { width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-bottom: 15px solid #ffdd57; position: absolute; z-index: 2; }
+    .beak-bottom { width: 0; height: 0; border-left: 13px solid transparent; border-right: 13px solid transparent; border-top: 13px solid #e6b800; position: absolute; top: 14px; left: 2px; z-index: 1; transform-origin: top center; }
+    .talking-bird.is-talking .beak-bottom { animation: chatter 0.06s infinite alternate linear; }
+    @keyframes chatter { 0% { transform: scaleY(0.1); } 100% { transform: scaleY(1.7) translateY(2px); } }
+
+    .talking-bird::after { content: ''; position: absolute; top: 44px; left: -18px; width: 36px; height: 28px; background: #fff; border-radius: 50%; transform-origin: right center; animation: wingFlap 0.08s infinite alternate linear; box-shadow: 0 0 15px var(--glow); }
+    .mascot-right .talking-bird::after { left: auto; right: -18px; transform-origin: left center; }
+    @keyframes wingFlap { 0% { transform: scaleY(1) rotate(35deg); } 100% { transform: scaleY(0.2) rotate(-25deg); } }
+
+    .speech-bubble {
+      background: #000; border: 3px solid var(--neon); border-radius: 20px; padding: 14px; text-align: center;
+      font-family: 'Courier New', Courier, monospace; font-size: 1rem; font-weight: 900; color: #fff;
+      margin-bottom: 24px; min-height: 75px; width: 220px; display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 25px var(--neon); animation: bubbleShudder 0.25s infinite alternate ease-in-out;
+    }
+    .mascot-left { --neon: #00e5ff; } .mascot-right { --neon: #ec4899; }
+    @keyframes bubbleShudder { 0% { transform: scale(0.97) translateY(1px); } 100% { transform: scale(1.03) translateY(-2px); } }
+
+    /* ── ARCADE CABINET ── */
+    .visualizer-rod { position: absolute; display: flex; justify-content: space-between; gap: 3px; pointer-events: none; }
+    .rod-top { top: -15px; left: 50px; right: 50px; height: 22px; flex-direction: row; }
+    .rod-top span { width: 100%; height: 100%; background: #00e5ff; border-radius: 2px; animation: danceBar 0.4s infinite alternate ease-in-out; transform-origin: bottom center; }
+    @keyframes danceBar { 0% { transform: scaleY(0.1); filter: brightness(0.7); } 100% { transform: scaleY(1); filter: brightness(1.6); box-shadow: 0 0 12px currentColor; } }
+    .rod-top span:nth-child(2n) { animation-delay: 0.1s; background: #ec4899; color: #ec4899; }
+    .rod-top span:nth-child(3n) { animation-delay: 0.2s; background: #ffdd57; color: #ffdd57; }
+
+    .screen-shaker { transition: transform 0.05s linear; }
+    .shake-active { animation: extremeImpact 0.15s infinite alternate; }
+    @keyframes extremeImpact { 0% { transform: translate(5px, -4px) rotate(0.4deg); } 100% { transform: translate(-5px, 5px) rotate(-0.4deg); } }
+
+    .arcade-cabinet {
+      position: relative; padding: 24px;
+      background: linear-gradient(135deg, #020813 0%, #00020a 100%);
+      border-radius: 44px; border: 6px solid #1e293b;
+      box-shadow: 0 0 50px rgba(0, 229, 255, 0.2), 0 40px 110px #000;
+      max-width: 960px; width: 100%;
+    }
+
+    #score-container {
+      display: flex; justify-content: space-between; align-items: center;
+      width: 100%; margin-bottom: 16px; padding: 0 8px;
+      font-family: 'Courier New', Courier, monospace;
+    }
+    .score-badge {
+      background: #000; padding: 10px 20px; border-radius: 14px;
+      border: 3px solid #1e293b; font-size: 1.2rem; font-weight: 900; letter-spacing: 0.1em;
+    }
+    #hi-display { color: #ffdd57; text-shadow: 0 0 15px #ffdd57; border-color: #ffdd57; }
+    #coin-display { color: #38bdf8; text-shadow: 0 0 15px #38bdf8; border-color: #38bdf8; }
+    #score-display { color: #00e5ff; text-shadow: 0 0 15px #00e5ff; border-color: #00e5ff; }
+
+    .audio-badge {
+      background: #000; padding: 10px 18px; border-radius: 14px; border: 3px solid #ef4444;
+      font-size: 1.1rem; font-weight: 900; color: #ef4444; text-shadow: 0 0 12px #ef4444;
+      cursor: pointer; transition: all 0.2s ease;
+    }
+    .audio-badge.muted { border-color: #22c55e; color: #22c55e; text-shadow: 0 0 12px #22c55e; }
+
+    /* CRT GAME TERMINAL SCREEN */
+    #game-wrap { position: relative; border-radius: 28px; overflow: hidden; background: #000; }
+    #game-wrap::after {
+      content: ""; position: absolute; inset: 0;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.4) 50%);
+      background-size: 100% 4px; pointer-events: none; z-index: 7;
+    }
+    canvas { display: block; width: 100%; height: auto; }
+    
+    #overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px; background: rgba(1, 4, 12, 0.96); z-index: 5; }
+    #overlay-title { font-family: 'Courier New', Courier, monospace; font-size: 3.8rem; font-weight: 900; letter-spacing: 0.12em; text-transform: uppercase; background: linear-gradient(180deg, #fff 0%, #ffdd57 50%, #00e5ff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; animation: ultraGlow 0.6s infinite alternate; }
+    @keyframes ultraGlow { 0% { filter: drop-shadow(0 0 20px #00e5ff); transform: scale(0.98); } 100% { filter: drop-shadow(0 0 45px #3b82f6) scale(1.03); } }
+
+    .action-btn {
+      background: linear-gradient(90deg, #00e5ff, #ffdd57, #ec4899, #00e5ff); background-size: 200% auto;
+      color: #000; font-family: 'Courier New', Courier, monospace; font-size: 1.4rem; font-weight: 900; letter-spacing: 0.15em; text-transform: uppercase;
+      padding: 18px 55px; border: none; border-radius: 50px; cursor: pointer;
+      box-shadow: 0 0 40px #00e5ff; animation: hyperBtn 0.8s infinite linear;
+    }
+    @keyframes hyperBtn { 0% { background-position: 0% center; } 100% { background-position: 200% center; } }
+
+    /* SKIN LAB */
+    .shop-container { margin-top: 24px; background: #000; border-radius: 28px; padding: 22px; border: 3px solid #1e293b; }
+    .shop-title { font-family: 'Courier New', Courier, monospace; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 0.2em; color: #ffdd57; margin-bottom: 18px; text-align: center; text-shadow: 0 0 15px #ffdd57; }
+    .shop-items { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    @media (max-width: 850px) { .shop-items { grid-template-columns: repeat(2, 1fr); } }
+
+    .shop-card { background: #01040c; border: 2px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 16px 12px; text-align: center; cursor: pointer; transition: all 0.2s ease; }
+    .shop-card:hover { border-color: #00e5ff; transform: scale(1.04); }
+    .shop-card.active { border-color: #00e5ff; background: rgba(0, 229, 255, 0.1); box-shadow: 0 0 25px #00e5ff; }
+
+    .skin-preview { width: 28px; height: 28px; border-radius: 6px; margin: 0 auto 10px; }
+    .skin-name { font-size: 0.9rem; font-weight: 900; margin-bottom: 4px; }
+    .skin-cost { font-family: 'Courier New', Courier, monospace; font-size: 0.85rem; color: #ffdd57; }
+
+    #hint { margin-top: 2rem; font-size: 1rem; color: #cbd5e1; text-align: center; line-height: 1.8; background: #000; padding: 18px 45px; border-radius: 50px; border: 2px solid #1e293b; max-width: 720px; z-index: 2; }
+    #hint strong { color: #00e5ff; text-shadow: 0 0 10px #00e5ff; }
+  </style>
+</head>
+<body>
+
+<div class="space-warp-tunnel"></div>
+<div class="bg-anomalies"></div>
+<div class="ambient-glow-pod glow-left"></div>
+<div class="ambient-glow-pod glow-right"></div>
+<div class="edge-lightning edge-left"></div>
+<div class="edge-lightning edge-right"></div>
+
+<div class="header-container">
+  <h1>🔋 BIRD RUN SKY BLUE</h1>
+</div>
+
+<div class="stage-container">
+  
+  <div class="welcome-bird-wingman mascot-left">
+    <div class="speech-bubble" id="msg-left">OVERDRIVE MODE!</div>
+    <div class="talking-bird" id="bird-left">
+      <div class="bird-eye left-eye"><div class="bird-pupil"></div></div>
+      <div class="bird-eye right-eye"><div class="bird-pupil"></div></div>
+      <div class="bird-beak-container">
+        <div class="beak-top"></div>
+        <div class="beak-bottom"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen-shaker" id="cabinet-shaker">
+    <div class="arcade-cabinet-wrapper">
+      <div class="visualizer-rod rod-top">
+        <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+      </div>
+
+      <div class="arcade-cabinet">
+        <div id="score-container">
+          <div id="hi-display" class="score-badge">BEST 00000</div>
+          <div id="coin-display" class="score-badge">🪙 0</div>
+          <div id="audio-toggle" class="audio-badge" onclick="toggleMuteState()">🔊 SOUND ON</div>
+          <div id="score-display" class="score-badge">00000</div>
+        </div>
+
+        <div id="game-wrap">
+          <canvas id="c" width="900" height="380"></canvas>
+          <div id="overlay">
+            <div id="overlay-title">SKY BLUE</div>
+            <button class="action-btn" id="action-trigger">Boot Match</button>
+          </div>
+        </div>
+
+        <div class="shop-container">
+          <div class="shop-title">🛠️ Prototype Customization Lab</div>
+          <div class="shop-items">
+            <div class="shop-card active" onclick="buyOrSelectSkin('classic')" id="skin-classic">
+              <div class="skin-preview" style="background: #00e5ff;"></div>
+              <div class="skin-name" style="color: #00e5ff;">Cyan Core</div>
+              <div class="skin-cost" id="cost-classic">Equipped</div>
+            </div>
+            <div class="shop-card" onclick="buyOrSelectSkin('cyber')" id="skin-cyber">
+              <div class="skin-preview" style="background: #3b82f6;"></div>
+              <div class="skin-name" style="color: #3b82f6;">Deep Volt</div>
+              <div class="skin-cost" id="cost-cyber">🪙 150</div>
+            </div>
+            <div class="shop-card" onclick="buyOrSelectSkin('plasma')" id="skin-plasma">
+              <div class="skin-preview" style="background: #ec4899;"></div>
+              <div class="skin-name" style="color: #ec4899;">Plasma Wing</div>
+              <div class="skin-cost" id="cost-plasma">🪙 350</div>
+            </div>
+            <div class="shop-card" onclick="buyOrSelectSkin('nebula')" id="skin-nebula">
+              <div class="skin-preview" style="background: #a855f7;"></div>
+              <div class="skin-name" style="color: #a855f7;">Nebula Wave</div>
+              <div class="skin-cost" id="cost-nebula">🪙 600</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="welcome-bird-wingman mascot-right">
+    <div class="speech-bubble" id="msg-right">DODGE THE PINK!</div>
+    <div class="talking-bird" id="bird-right">
+      <div class="bird-eye left-eye"><div class="bird-pupil"></div></div>
+      <div class="bird-eye right-eye"><div class="bird-pupil"></div></div>
+      <div class="bird-beak-container">
+        <div class="beak-top"></div>
+        <div class="beak-bottom"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<p id="hint">
+  Press <strong>Spacebar / ↑ Arrow Key</strong> or tap screen to Jump. You have a <strong>TRIPLE JUMP</strong>!<br>
+  ⚠️ Watch out! The **Swooping Pink Birds** now dive and stick to the ground, acting as lethal obstacles.
+</p>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const W = canvas.width, H = canvas.height;
+const GROUND_Y = H - 50;
+
+let gameState = 'idle';
+let score = 0, hiScore = 0, frame = 0;
+let speed = 9.5; 
+let obstacles = [];
+let particles = [];
+let isAudioMuted = false;
+
+let coins = parseInt(localStorage.getItem('psr_coins')) || 0;
+let unlockedSkins = JSON.parse(localStorage.getItem('psr_skins')) || ['classic'];
+let currentSkin = localStorage.getItem('psr_current_skin') || 'classic';
+
+document.getElementById('coin-display').textContent = `🪙 ${coins}`;
+
+const skinsConfig = {
+  classic: { main: '#00e5ff', glow: '#00e5ff' },
+  cyber:   { main: '#3b82f6', glow: '#3b82f6' },
+  plasma:  { main: '#ec4899', glow: '#ec4899' },
+  nebula:  { main: '#a855f7', glow: '#a855f7' }
+};
+const skinCosts = { classic: 0, cyber: 150, plasma: 350, nebula: 600 };
+
+function toggleMuteState() {
+  isAudioMuted = !isAudioMuted;
+  const btn = document.getElementById('audio-toggle');
+  if (isAudioMuted) {
+    btn.textContent = "🔇 MUTED"; btn.classList.add('muted');
+  } else {
+    btn.textContent = "🔊 SOUND ON"; btn.classList.remove('muted');
+  }
+}
+
+/* ── INTERACTIVE PARTICLE MOTOR ── */
+class Particle {
+  constructor(x, y, vx, vy, size, color) {
+    this.x = x; this.y = y; this.vx = vx; this.vy = vy;
+    this.size = size; this.color = color; this.alpha = 1;
+  }
+  update() {
+    this.x += this.vx; this.y += this.vy;
+    this.alpha -= 0.04;
+  }
+  draw() {
+    ctx.save(); ctx.globalAlpha = Math.max(0, this.alpha);
+    ctx.fillStyle = this.color; ctx.fillRect(this.x, this.y, this.size, this.size);
+    ctx.restore();
+  }
+}
+
+/* ── 8-BIT SYNTH INTERACTIVE AUDIO MOTOR ── */
+let audioCtx = null;
+let musicInterval = null;
+let bpm = 160; 
+let noteLen = 60 / bpm / 2;
+let seqStep = 0;
+let nextEventTime = 0;
+
+function initAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+}
+
+function playMusicTick() {
+  if (gameState !== 'playing' || isAudioMuted) return;
+  const now = audioCtx.currentTime;
+
+  while (nextEventTime < now + 0.1) {
+    let t = nextEventTime;
+
+    let bassOsc = audioCtx.createOscillator();
+    let bassGain = audioCtx.createGain();
+    bassOsc.type = 'square';
+    
+    let bassPattern = [110.0, 110.0, 146.8, 146.8, 130.8, 130.8, 164.8, 196.0];
+    let currentFreq = bassPattern[Math.floor(seqStep / 4) % bassPattern.length];
+    if (seqStep % 2 === 1) currentFreq *= 2;
+
+    bassOsc.frequency.setValueAtTime(currentFreq, t);
+    bassGain.gain.setValueAtTime(0.05, t);
+    bassGain.gain.exponentialRampToValueAtTime(0.002, t + noteLen * 0.8);
+    
+    bassOsc.connect(bassGain);
+    bassGain.connect(audioCtx.destination);
+    bassOsc.start(t); bassOsc.stop(t + noteLen * 0.9);
+
+    if (seqStep % 2 === 0) {
+      let leadOsc = audioCtx.createOscillator();
+      let leadGain = audioCtx.createGain();
+      leadOsc.type = 'triangle';
+      
+      let melodyArr = [440.0, 587.3, 523.3, 659.3, 784.0, 880.0, 587.3, 1046.5];
+      let leadFreq = melodyArr[seqStep % melodyArr.length];
+      if (seqStep % 16 >= 8) leadFreq *= 1.2;
+
+      leadOsc.frequency.setValueAtTime(leadFreq, t);
+      leadGain.gain.setValueAtTime(0.03, t);
+      leadGain.gain.exponentialRampToValueAtTime(0.001, t + 0.1);
+      
+      leadOsc.connect(leadGain);
+      leadGain.connect(audioCtx.destination);
+      leadOsc.start(t); leadOsc.stop(t + 0.12);
+    }
+
+    nextEventTime += noteLen;
+    seqStep = (seqStep + 1) % 32;
+  }
+}
+
+function startMusic() {
+  initAudio();
+  nextEventTime = audioCtx.currentTime + 0.02;
+  seqStep = 0;
+  if (!musicInterval) musicInterval = setInterval(playMusicTick, 25);
+}
+
+function stopMusic() {
+  if (musicInterval) { clearInterval(musicInterval); musicInterval = null; }
+}
+
+function sfxJump() {
+  if (isAudioMuted) return; initAudio();
+  const now = audioCtx.currentTime;
+  const osc = audioCtx.createOscillator(); const g = audioCtx.createGain();
+  osc.type = 'triangle'; osc.frequency.setValueAtTime(220, now);
+  osc.frequency.exponentialRampToValueAtTime(850, now + 0.09);
+  g.gain.setValueAtTime(0.12, now); g.gain.linearRampToValueAtTime(0.001, now + 0.09);
+  osc.connect(g); g.connect(audioCtx.destination);
+  osc.start(now); osc.stop(now + 0.09);
+}
+
+function sfxCoin() {
+  if (isAudioMuted) return; initAudio();
+  const now = audioCtx.currentTime;
+  const osc = audioCtx.createOscillator(); const g = audioCtx.createGain();
+  osc.type = 'sine'; osc.frequency.setValueAtTime(950, now);
+  osc.frequency.setValueAtTime(1350, now + 0.05);
+  g.gain.setValueAtTime(0.08, now); g.gain.linearRampToValueAtTime(0.001, now + 0.15);
+  osc.connect(g); g.connect(audioCtx.destination);
+  osc.start(now); osc.stop(now + 0.15);
+}
+
+const greetingsMenu = ["READY CHIP?", "LEVEL RUN!", "TRIPLE JUMP ON!", "COLLECT GOLD!", "WATCH FOR PINK!", "SWOOP ATTACK!"];
+function triggerMascotSpeech(isGameOver = false) {
+  document.getElementById('bird-left').classList.add('is-talking');
+  document.getElementById('bird-right').classList.add('is-talking');
+  if (isGameOver) {
+    document.getElementById('msg-left').textContent = "CRASH INBOUND!";
+    document.getElementById('msg-right').textContent = "RELOAD SYSTEM!";
+  } else {
+    document.getElementById('msg-left').textContent = greetingsMenu[Math.floor(Math.random() * greetingsMenu.length)];
+    document.getElementById('msg-right').textContent = greetingsMenu[Math.floor(Math.random() * greetingsMenu.length)];
+  }
+  setTimeout(() => {
+    document.getElementById('bird-left').classList.remove('is-talking');
+    document.getElementById('bird-right').classList.remove('is-talking');
+  }, 1500);
+}
+
+/* ── SKIN LAB SYSTEM ── */
+function updateShopUI() {
+  Object.keys(skinsConfig).forEach(id => {
+    const card = document.getElementById(`skin-${id}`);
+    const costText = document.getElementById(`cost-${id}`);
+    if (!card) return;
+    card.classList.remove('active');
+    if (currentSkin === id) {
+      card.classList.add('active'); costText.textContent = "Equipped";
+    } else if (unlockedSkins.includes(id)) {
+      costText.textContent = "Unlocked";
+    } else {
+      costText.textContent = `🪙 ${skinCosts[id]}`;
+    }
+  });
+}
+
+function buyOrSelectSkin(id) {
+  if (unlockedSkins.includes(id)) {
+    currentSkin = id;
+    localStorage.setItem('psr_current_skin', id);
+  } else {
+    let cost = skinCosts[id];
+    if (coins >= cost) {
+      coins -= cost; unlockedSkins.push(id); currentSkin = id;
+      localStorage.setItem('psr_coins', coins);
+      localStorage.setItem('psr_skins', JSON.stringify(unlockedSkins));
+      localStorage.setItem('psr_current_skin', id);
+      document.getElementById('coin-display').textContent = `🪙 ${coins}`;
+      sfxCoin();
+    } else {
+      alert("Insufficient Tokens!");
+    }
+  }
+  updateShopUI();
+}
+updateShopUI();
+
+/* ── OBJECT ARCHITECTURE ── */
+class Runner {
+  constructor() {
+    this.x = 110; this.y = GROUND_Y - 32;
+    this.w = 32; this.h = 32;
+    this.vy = 0; this.gravity = 1.35; 
+    this.jumpsLeft = 3; this.angle = 0;
+  }
+  jump() {
+    if (this.jumpsLeft > 0) {
+      this.vy = -16.2; this.jumpsLeft--; sfxJump();
+      for (let i = 0; i < 6; i++) {
+        particles.push(new Particle(this.x, this.y + 16, -2 - Math.random() * 2, (Math.random() - 0.5) * 2, 5, skinsConfig[currentSkin].main));
+      }
+    }
+  }
+  update() {
+    this.vy += this.gravity; this.y += this.vy;
+    if (this.y >= GROUND_Y - this.h) {
+      this.y = GROUND_Y - this.h; this.vy = 0; this.jumpsLeft = 3;
+    }
+    if (gameState === 'playing' && this.y < GROUND_Y - this.h) this.angle += 0.18;
+    else this.angle = 0;
+  }
+  draw() {
+    ctx.save(); ctx.translate(this.x + 16, this.y + 16); ctx.rotate(this.angle);
+    ctx.shadowColor = skinsConfig[currentSkin].glow; ctx.shadowBlur = 14;
+    ctx.fillStyle = skinsConfig[currentSkin].main; ctx.fillRect(-16, -16, 32, 32);
+    ctx.fillStyle = '#000'; ctx.fillRect(4, -10, 8, 12);
+    ctx.fillStyle = '#fff'; ctx.fillRect(6, -8, 4, 4);
+    ctx.restore();
+  }
+}
+
+class Obstacle {
+  constructor(type, variant = 'single', targetY = 0) {
+    this.type = type; this.variant = variant; this.x = W + 60; this.passed = false;
+    this.anim = Math.random() * 5; this.initialY = targetY;
+    
+    if (type === 'cactus') {
+      if (variant === 'single') { this.w = 26; this.h = 44; }
+      else if (variant === 'double') { this.w = 52; this.h = 46; }
+      else if (variant === 'triple') { this.w = 78; this.h = 48; }
+      else if (variant === 'double-jump') { this.w = 32; this.h = 85; } 
+      else if (variant === 'triple-jump') { this.w = 36; this.h = 140; }
+      else if (variant === 'warning-pink') { this.w = 32; this.h = 55; }
+      this.y = GROUND_Y - this.h;
+    } else if (type === 'bird') {
+      this.w = 38; this.h = 24; this.y = targetY;
+    } else if (type === 'coin') {
+      this.w = 22; this.h = 22; this.y = targetY;
+    }
+  }
+  update() { 
+    this.x -= speed; 
+    if (this.type === 'bird' && this.variant === 'swoop' && this.x < W * 0.7) {
+      this.y += 5.5; 
+      if (this.y >= GROUND_Y - this.h) {
+        this.y = GROUND_Y - this.h;
+      }
+    }
+  }
+  drawBlockCactus(x, y, h, clr) {
+    ctx.fillStyle = clr;
+    ctx.fillRect(x + 9, y, 8, h);
+    ctx.fillRect(x, y + 12, 10, 6); ctx.fillRect(x, y + 6, 6, 8);
+    ctx.fillRect(x + 15, y + 20, 11, 6); ctx.fillRect(x + 20, y + 10, 6, 12);
+  }
+  drawTallBlockCactus(x, y, h, clr) {
+    ctx.fillStyle = clr;
+    ctx.fillRect(x + 12, y, 10, h);
+    ctx.fillRect(x, y + 25, 14, 8); ctx.fillRect(x, y + 12, 7, 15);
+    ctx.fillRect(x + 20, y + 45, 14, 8); ctx.fillRect(x + 27, y + 25, 7, 22);
+  }
+  draw() {
+    ctx.save();
+    if (this.type === 'cactus') {
+      if (this.variant === 'warning-pink') {
+        ctx.shadowColor = '#ec4899'; ctx.shadowBlur = 14;
+        this.drawBlockCactus(this.x, this.y, this.h, '#ec4899');
+        ctx.strokeStyle = '#ec4899'; ctx.lineWidth = 2; ctx.setLineDash([4, 4]);
+        ctx.beginPath(); ctx.moveTo(this.x + this.w/2, this.y); ctx.lineTo(this.x + this.w/2, 0); ctx.stroke();
+      } else if (this.variant === 'double-jump' || this.variant === 'triple-jump') {
+        ctx.shadowColor = '#00e5ff'; ctx.shadowBlur = 12;
+        this.drawTallBlockCactus(this.x, this.y, this.h, '#0284c7');
+      } else if (this.variant === 'double') {
+        ctx.shadowColor = '#0284c7'; ctx.shadowBlur = 12;
+        this.drawBlockCactus(this.x, this.y + 2, this.h - 2, '#0284c7');
+        this.drawBlockCactus(this.x + 26, this.y, this.h, '#0169a1');
+      } else if (this.variant === 'triple') {
+        ctx.shadowColor = '#0284c7'; ctx.shadowBlur = 12;
+        this.drawBlockCactus(this.x, this.y + 4, this.h - 4, '#0284c7');
+        this.drawBlockCactus(this.x + 26, this.y, this.h, '#0169a1');
+        this.drawBlockCactus(this.x + 52, this.y + 2, this.h - 2, '#0284c7');
+      } else {
+        ctx.shadowColor = '#0284c7'; ctx.shadowBlur = 12;
+        this.drawBlockCactus(this.x, this.y, this.h, '#0284c7');
+      }
+    } else if (this.type === 'bird') {
+      let mainColor = (this.variant === 'swoop' || this.variant === 'downbound') ? '#ec4899' : '#ef4444';
+      ctx.shadowColor = mainColor; ctx.shadowBlur = 12; ctx.fillStyle = mainColor;
+      ctx.beginPath(); ctx.arc(this.x + 18, this.y + 12, 12, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#000'; ctx.fillRect(this.x + 16, this.y + 6, 10, 3);
+      ctx.fillStyle = '#facc15'; ctx.beginPath(); ctx.moveTo(this.x + 8, this.y + 12); ctx.lineTo(this.x - 4, this.y + 9); ctx.lineTo(this.x + 8, this.y + 16); ctx.fill();
+      ctx.fillStyle = '#991b1b'; ctx.save(); ctx.translate(this.x + 20, this.y + 12);
+      ctx.rotate(Math.sin((frame + this.anim) * 0.6) * 0.7); ctx.fillRect(-4, -10, 8, 12); ctx.restore();
+    } else if (this.type === 'coin') {
+      ctx.shadowColor = '#eab308'; ctx.shadowBlur = 12; ctx.fillStyle = '#facc15';
+      ctx.beginPath(); ctx.arc(this.x + 11, this.y + 11, 11, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#000'; ctx.font = '900 12px monospace'; ctx.fillText('$', this.x + 8, this.y + 15);
+    }
+    ctx.restore();
+  }
+}
+
+const player = new Runner();
+
+function spawnLogic() {
+  if (frame % 42 === 0 && Math.random() < 0.92) { 
+    let rand = Math.random();
+    
+    if (rand < 0.35) {
+      let groundLevelY = GROUND_Y - 26 - (Math.random() * 24); 
+      obstacles.push(new Obstacle('coin', 'single', groundLevelY));
+    } else if (rand < 0.48) {
+      obstacles.push(new Obstacle('cactus', 'single'));
+    } else if (rand < 0.58) {
+      obstacles.push(new Obstacle('cactus', 'double'));
+    } else if (rand < 0.68) {
+      obstacles.push(new Obstacle('cactus', 'triple'));
+    } else if (rand < 0.75) {
+      obstacles.push(new Obstacle('cactus', 'double-jump'));
+    } else if (rand < 0.82) {
+      obstacles.push(new Obstacle('cactus', 'triple-jump'));
+    } else {
+      obstacles.push(new Obstacle('cactus', 'warning-pink'));
+      let attackType = Math.random() > 0.5 ? 'swoop' : 'downbound';
+      let heightTarget = attackType === 'swoop' ? GROUND_Y - 200 : GROUND_Y - 30;
+      setTimeout(() => {
+        if (gameState === 'playing') obstacles.push(new Obstacle('bird', attackType, heightTarget));
+      }, 480); 
+    }
+  }
+}
+
+function handleGameOver() {
+  gameState = 'gameover'; stopMusic();
+  document.getElementById('cabinet-shaker').classList.add('shake-active');
+  setTimeout(() => document.getElementById('cabinet-shaker').classList.remove('shake-active'), 350);
+  
+  if (score > hiScore) {
+    hiScore = score; document.getElementById('hi-display').textContent = `BEST ${String(hiScore).padStart(5, '0')}`;
+  }
+  localStorage.setItem('psr_coins', coins);
+  triggerMascotSpeech(true);
+
+  document.getElementById('overlay-title').textContent = "SYSTEM CRASH";
+  document.getElementById('action-trigger').textContent = "Reboot Module";
+  document.getElementById('overlay').style.display = 'flex';
+}
+
+function startMatch() {
+  score = 0; speed = 9.5; obstacles = []; particles = []; frame = 0;
+  player.y = GROUND_Y - player.h; player.vy = 0; player.jumpsLeft = 3;
+  gameState = 'playing'; triggerMascotSpeech(false);
+  document.getElementById('overlay').style.display = 'none';
+  startMusic();
+}
+
+function checkOverlap(r1, r2) {
+  return r1.x < r2.x + r2.w && r1.x + r1.w > r2.x && r1.y < r2.y + r2.h && r1.y + r1.h > r2.y;
+}
+
+/* ── SYSTEM EXECUTION LOOP ── */
+function loop() {
+  frame++;
+  ctx.clearRect(0, 0, W, H);
+
+  // Background Grids & Rich Texture Walls
+  ctx.fillStyle = '#010512'; ctx.fillRect(0, 0, W, GROUND_Y);
+  ctx.strokeStyle = 'rgba(0, 229, 255, 0.05)'; ctx.lineWidth = 2;
+  for (let x = 0; x < W; x += 40) {
+    ctx.beginPath(); ctx.moveTo(x - (frame * 1.5 % 40), 0); ctx.lineTo(x - (frame * 1.5 % 40), GROUND_Y); ctx.stroke();
+  }
+  for (let y = 0; y < GROUND_Y; y += 35) {
+    ctx.strokeStyle = 'rgba(236, 72, 153, 0.03)';
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+  }
+
+  // Ground Setup with high texture track details
+  ctx.fillStyle = '#060f24'; ctx.fillRect(0, GROUND_Y, W, 50);
+  ctx.fillStyle = '#00e5ff'; ctx.fillRect(0, GROUND_Y, W, 4);
+  ctx.fillStyle = 'rgba(236, 72, 153, 0.3)';
+  for (let i = 0; i < W; i += 25) {
+    ctx.fillRect(i - (frame * speed % 25), GROUND_Y + 12, 8, 4);
+  }
+
+  player.update();
+  
+  if (gameState === 'playing') {
+    if (frame % 5 === 0) score++;
+    document.getElementById('score-display').textContent = String(score).padStart(5, '0');
+    if (frame % 200 === 0) speed += 0.45; 
+    spawnLogic();
+  }
+
+  for (let i = particles.length - 1; i >= 0; i--) {
+    particles[i].update(); particles[i].draw();
+    if (particles[i].alpha <= 0) particles.splice(i, 1);
+  }
+
+  for (let i = obstacles.length - 1; i >= 0; i--) {
+    let obs = obstacles[i]; obs.update(); obs.draw();
+    if (checkOverlap(player, obs)) {
+      if (obs.type === 'coin') {
+        coins++; document.getElementById('coin-display').textContent = `🪙 ${coins}`;
+        sfxCoin(); obstacles.splice(i, 1); continue;
+      } else {
+        handleGameOver();
+      }
+    }
+    if (obs.x + obs.w < 0) obstacles.splice(i, 1);
+  }
+
+  player.draw();
+  requestAnimationFrame(loop);
+}
+
+document.getElementById('action-trigger').addEventListener('click', (e) => { e.stopPropagation(); initAudio(); startMatch(); });
+window.addEventListener('keydown', (e) => {
+  if (e.code === 'Space' || e.code === 'ArrowUp') {
+    e.preventDefault(); initAudio();
+    if (gameState === 'playing') player.jump();
+    else if (gameState === 'idle' || gameState === 'gameover') startMatch();
+  }
+});
+canvas.addEventListener('touchstart', (e) => {
+  e.preventDefault(); initAudio();
+  if (gameState === 'playing') player.jump();
+  else if (gameState === 'idle' || gameState === 'gameover') startMatch();
+}, { passive: false });
+
+loop();
+</script>
+</body>
+</html>
